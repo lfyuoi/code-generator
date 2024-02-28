@@ -14,9 +14,9 @@ public class MainTemplateConfig {
     /**
      * 作者注释(字符串，填充值)
      */
-    private String author;
+    private String author = "lfyuoi";
     /**
      * 输出信息
      */
-    private String outputText;
+    private String outputText = "输出结果";
 }
