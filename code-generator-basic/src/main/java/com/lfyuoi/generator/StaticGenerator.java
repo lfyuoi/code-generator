@@ -19,7 +19,7 @@ public class StaticGenerator {
         // 获取根目录 code-generator 路径
         File parentFile = new File(projectPath).getParentFile();
         // 输入路径：ACM示例代码目录
-        String inputPath = new File(projectPath, "code-generator-demo-projects\\acm-template").getAbsolutePath();
+        String inputPath = new File(projectPath, "code-generator\\code-generator-demo-projects\\acm-template").getAbsolutePath();
         // 输出路径：code-generator-basic
         String outputPath =  projectPath;
         copyFilesByRecursive(inputPath, outputPath);

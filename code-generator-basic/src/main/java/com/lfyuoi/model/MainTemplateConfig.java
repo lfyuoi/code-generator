@@ -7,16 +7,17 @@ import lombok.Data;
  */
 @Data
 public class MainTemplateConfig {
-    /**
-     * 是否生成循环（开关）
-     */
-    private boolean loop;
-    /**
-     * 作者注释(字符串，填充值)
-     */
-    private String author = "lfyuoi";
-    /**
-     * 输出信息
-     */
-    private String outputText = "输出结果";
+
+  /**
+   * 是否生成循环（开关）
+   */
+  private boolean loop;
+  /**
+   * 作者注释(字符串，填充值)
+   */
+  private String author = "lfyuoi";
+  /**
+   * 输出信息
+   */
+  private String outputText = "输出结果";
 }

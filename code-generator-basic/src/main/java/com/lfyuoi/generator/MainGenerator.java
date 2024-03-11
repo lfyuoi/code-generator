@@ -6,31 +6,42 @@ import freemarker.template.TemplateException;
 import java.io.File;
 import java.io.IOException;
 
+
 public class MainGenerator {
 
-    public static void main(String[] args) throws TemplateException, IOException {
-        //1.静态文件生成
-        // 获取当前模块目录 code-generator-basic 路径
-        String projectPath = System.getProperty("user.dir");
-        // 获取根目录 code-generator 路径
-        File parentFile = new File(projectPath).getParentFile();
-        // 输入路径：ACM示例代码目录
-        String inputPath = new File(projectPath, "code-generator-demo-projects/acm-template").getAbsolutePath();
-        // 输出路径：code-generator-basic
-        String outputPath =  new File(projectPath, "code-generator-basic").getAbsolutePath();
-        StaticGenerator.copyFilesByRecursive(inputPath, outputPath);
 
+  public static void main(String[] args) throws IOException, TemplateException {
+    MainTemplateConfig mainTemplateConfig = new MainTemplateConfig();
+    mainTemplateConfig.setAuthor("dexter");
+    mainTemplateConfig.setLoop(false);
+    mainTemplateConfig.setOutputText("最终の求和结果：");
+    doGenerate(mainTemplateConfig);
+  }
 
-        //2.动态文件生成
-        // 当前idea打开的窗口
-        String dynamicInputPath = projectPath + File.separator + "code-generator-basic/src/main/resources/templates/MainTemplateConfig.java.ftl";
-        String dynamicOutputPath = projectPath + File.separator + "MainTemplate3.java";
-        // 这次使用循环
-        MainTemplateConfig mainTemplateConfig = new MainTemplateConfig();
-        mainTemplateConfig.setAuthor("lfyuoi");
-        mainTemplateConfig.setOutputText("输出结果动态文件");
-        mainTemplateConfig.setLoop(true);
-        //调用生成器方法
-        DynamicGenerator.doGenerate(dynamicInputPath,dynamicOutputPath,mainTemplateConfig);
-    }
+  /**
+   * 生成静态文件和动态文件
+   *
+   * @param model
+   * @throws TemplateException
+   * @throws IOException
+   */
+  public static void doGenerate(Object model) throws IOException, TemplateException {
+    // 当前idea打开的窗口
+    String projectPath = System.getProperty("user.dir");
+    // 找整个项目的根路径 code-generator
+    File parentFile = new File(projectPath).getParentFile();
+    // 输入路径 ACM的示例模板 在 code-generator-demo-projects 目录下
+    String inputPath = new File(parentFile + File.separator
+        + "code-generator/code-generator-demo-projects/acm-template").getAbsolutePath();
+    // 输出路径
+    String outputPath = projectPath;
+    // 生成静态文件
+    StaticGenerator.copyFilesByRecursive(inputPath, outputPath);
+    // 生成动态文件，会覆盖部分已生成的静态文件
+    String inputDynamicFilePath =
+        projectPath + File.separator + "src/main/resources/templates/MainTemplate.java.ftl";
+    String outputDynamicFilePath =
+        projectPath + File.separator + "acm-template/src/com/yupi/acm/MainTemplate.java";
+    DynamicGenerator.doGenerate(inputDynamicFilePath, outputDynamicFilePath, model);
+  }
 }
