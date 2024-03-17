@@ -1,21 +1,22 @@
-package com.lfyuoi.generator;
+package com.lfyuoi.maker.generator.file;
 
-import com.lfyuoi.model.MainTemplateConfig;
+import com.lfyuoi.maker.generator.file.DynamicFileGenerator;
+import com.lfyuoi.maker.model.DataModel;
 import freemarker.template.TemplateException;
 
 import java.io.File;
 import java.io.IOException;
 
 
-public class MainGenerator {
+public class FileGenerator {
 
 
   public static void main(String[] args) throws IOException, TemplateException {
-    MainTemplateConfig mainTemplateConfig = new MainTemplateConfig();
-    mainTemplateConfig.setAuthor("dexter");
-    mainTemplateConfig.setLoop(false);
-    mainTemplateConfig.setOutputText("最终の求和结果：");
-    doGenerate(mainTemplateConfig);
+    DataModel dataModel = new DataModel();
+    dataModel.setAuthor("dexter");
+    dataModel.setLoop(false);
+    dataModel.setOutputText("最终的求和结果：");
+    doGenerate(dataModel);
   }
 
   /**
@@ -36,13 +37,13 @@ public class MainGenerator {
     // 输出路径
     String outputPath = projectPath;
     // 生成静态文件
-    StaticGenerator.copyFilesByRecursive(inputPath, outputPath);
+    StaticFileGenerator.copyFilesByHutool(inputPath, outputPath);
     // 生成动态文件，会覆盖部分已生成的静态文件
     String inputDynamicFilePath =
         projectPath + File.separator + "src/main/resources/templates/MainTemplate.java.ftl";
     String outputDynamicFilePath =
         projectPath + File.separator + "acm-template/src/com/yupi/acm/MainTemplate.java";
-    DynamicGenerator.doGenerate(inputDynamicFilePath, outputDynamicFilePath, model);
+    DynamicFileGenerator.doGenerate(inputDynamicFilePath, outputDynamicFilePath, model);
   }
 }
 
