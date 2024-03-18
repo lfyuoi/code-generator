@@ -1,4 +1,4 @@
-package com.lfyuoi.maker.cli.meta;
+package com.lfyuoi.maker.meta;
 
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.json.JSONUtil;

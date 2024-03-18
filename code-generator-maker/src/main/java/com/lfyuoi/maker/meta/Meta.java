@@ -1,4 +1,4 @@
-package com.lfyuoi.maker.cli.meta;
+package com.lfyuoi.maker.meta;
 
 import java.util.List;
 import lombok.Data;
