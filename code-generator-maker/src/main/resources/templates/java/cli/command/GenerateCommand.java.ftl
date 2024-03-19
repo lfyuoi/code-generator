@@ -2,8 +2,8 @@ package ${basePackage}.cli.command;
 
 import cn.hutool.core.bean.BeanUtil;
 import ${basePackage}.cli.util.ReflexUtil;
-import ${basePackage}.generator.file.FileGenerator;
-import ${basePackage}.model.DataModel;
+import ${basePackage}.generator.MainGenerator;
+import ${basePackage}.model.DateModel;
 import lombok.Data;
 import lombok.SneakyThrows;
 import picocli.CommandLine;
@@ -37,8 +37,8 @@ public class GenerateCommand implements Runnable {
     public void run() {
         ReflexUtil.setFieldsWithInteractiveAnnotation(this, this.getClass());
 
-        DataModel config = new DataModel();
+        DateModel config = new DateModel();
         BeanUtil.copyProperties(this, config);
-        FileGenerator.doGenerate(config);
+        MainGenerator.doGenerate(config);
     }
 }

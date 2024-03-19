@@ -4,46 +4,40 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.lfyuoi</groupId>
-    <artifactId>code-generator-maker</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>${basePackage}</groupId>
+    <artifactId>${name}</artifactId>
+    <version>${version}</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- JDK1.8-->
-        <java.version>1.8</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
     </properties>
 
+
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-all -->
+        <!-- https://doc.hutool.cn/ -->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>5.8.20</version>
+            <version>5.8.22</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.freemarker/freemarker -->
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-            <version>2.3.32</version>
-        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
             <version>4.4</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+
+        <!-- https://projectlombok.org/ -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
             <groupId>junit</groupId>
@@ -51,23 +45,24 @@
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- https://freemarker.apache.org/index.html -->
         <dependency>
-        <!--https://picocli.info/-->
-        <groupId>info.picocli</groupId>
-        <artifactId>picocli-codegen</artifactId>
-        <version>4.7.5</version>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.32</version>
         </dependency>
+        <!-- https://picocli.info -->
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>4.7.5</version>
+        </dependency>
+
     </dependencies>
+
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>16</source>
-                    <target>16</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -78,7 +73,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.lfyuoi.maker.Main</mainClass> <!-- 替换为你的主类的完整类名 -->
+                            <mainClass>${basePackage}.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -97,7 +92,6 @@
                 <version>3.1</version>
             </plugin>
         </plugins>
-
     </build>
-    <!-- 后面还有再补充 -->
+
 </project>

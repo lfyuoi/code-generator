@@ -7,7 +7,7 @@
   "createTime": "2024-3-17",
   "fileConfig": {
     "inputRootPath": "C:/code/code-generator/code-generator-demo-projects/acm-template-pro",
-    "outputRootPath": "generator",
+    "outputRootPath": "generated",
     "type": "dir",
     "files": [
       {
