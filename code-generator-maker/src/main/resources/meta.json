@@ -6,8 +6,9 @@
   "author": "lfyuoi",
   "createTime": "2024-3-17",
   "fileConfig": {
-    "inputRootPath": "C:/code/code-generator/code-generator-demo-projects/acm-template-pro",
+    "inputRootPath": ".source/acm-template-pro",
     "outputRootPath": "generated",
+    "sourceRootPath": "C:/code/code-generator/code-generator-demo-projects/acm-template-pro",
     "type": "dir",
     "files": [
       {

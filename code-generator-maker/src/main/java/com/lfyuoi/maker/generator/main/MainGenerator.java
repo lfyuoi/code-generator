@@ -1,8 +1,10 @@
-package com.lfyuoi.maker.generator;
+package com.lfyuoi.maker.generator.main;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.StrUtil;
+import com.lfyuoi.maker.generator.JarGenerator;
+import com.lfyuoi.maker.generator.ScriptGenerator;
 import com.lfyuoi.maker.meta.MateManager;
 import com.lfyuoi.maker.meta.Meta;
 import com.lfyuoi.maker.generator.file.DynamicFileGenerator;
@@ -18,10 +20,15 @@ public class MainGenerator {
 
     //输出的根路径
     String projectPath = System.getProperty("user.dir");
-    String outputPath = projectPath + File.separator + "generator";
+    String outputPath = projectPath + "/Generated" + File.separator + meta.getName();
     if (!FileUtil.exist(outputPath)) {
       FileUtil.mkdir(outputPath);
     }
+
+    // 将源文件拷贝到输出目录
+    String sourceRootPath = meta.getFileConfig().getSourceRootPath();
+    String sourceOutputPath = outputPath + File.separator + ".source";
+    FileUtil.copy(sourceRootPath, sourceOutputPath,false);
 
     //读取resource目录
     ClassPathResource classPathResource = new ClassPathResource("");
@@ -110,11 +117,31 @@ public class MainGenerator {
     outputFilePath = outputPath + File.separator + "pom.xml";
     DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
 
+    // templates README.md.ftl
+    inputFilePath = inputResourcePath + File.separator + "templates" + File.separator + "README.md.ftl";
+    outputFilePath = outputPath + File.separator + "README.md";
+    DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
+
     // 构建jar包
     JarGenerator.doGenerate(outputPath);
 
     // 封装脚本
     String jarName = String.format("%s-%s-jar-with-dependencies.jar", meta.getName(),meta.getVersion());
-    ScriptGenerator.doGenerate(outputPath + File.separator + "generator", "target/" + jarName);
+    String jarPath = "target/" + jarName;
+    ScriptGenerator.doGenerate(outputPath + File.separator + "generator", jarPath);
+
+    // 生成精简版本的程序
+    String distOutputPath = outputPath + "-dist";
+    // jar包文件
+    String distJarPath = distOutputPath + File.separator + "target";
+    FileUtil.mkdir(distJarPath);
+    String jarAbsolutePath = outputPath + File.separator + jarPath;
+    FileUtil.copy(jarAbsolutePath,distJarPath,true);
+    // 脚本文件
+    String scriptAbsolutePath = outputPath + File.separator + "generator";
+    FileUtil.copy(scriptAbsolutePath,distOutputPath,true);
+    FileUtil.copy(scriptAbsolutePath + ".bat",distOutputPath,true);
+    // 拷贝.source文件夹
+    FileUtil.copy(sourceOutputPath,distOutputPath,true);
   }
 }

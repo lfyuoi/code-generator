@@ -23,6 +23,7 @@ public class Meta {
 
     private String inputRootPath;
     private String outputRootPath;
+    private String sourceRootPath;
     private String type;
     private List<FileInfo> files;
 
