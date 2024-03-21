@@ -12,7 +12,6 @@ import com.lfyuoi.maker.meta.Meta.ModelConfig;
 import com.lfyuoi.maker.meta.enums.FileGenerateTypeEnum;
 import com.lfyuoi.maker.meta.enums.FileTypeEnum;
 import com.lfyuoi.maker.meta.enums.ModelTypeEnum;
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 

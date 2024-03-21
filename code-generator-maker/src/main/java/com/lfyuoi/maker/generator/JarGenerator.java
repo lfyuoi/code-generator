@@ -1,7 +1,5 @@
 package com.lfyuoi.maker.generator;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.*;
 
 /**
