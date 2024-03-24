@@ -1,7 +1,7 @@
 package ${basePackage}.cli.command;
 
 import cn.hutool.core.util.ReflectUtil;
-import ${basePackage}.model.DateModel;
+import ${basePackage}.model.DataModel;
 import picocli.CommandLine;
 
 import java.lang.reflect.Field;
@@ -17,7 +17,7 @@ public class ConfigCommand implements Runnable{
     @Override
     public void run() {
         Field[] fields =
-                ReflectUtil.getFields(DateModel.class);
+                ReflectUtil.getFields(DataModel.class);
         for (Field field : fields) {
             System.out.println(field.getName() + " : " + field.getType().getName());
         }

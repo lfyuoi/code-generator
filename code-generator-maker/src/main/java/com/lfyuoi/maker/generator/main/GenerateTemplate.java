@@ -20,7 +20,7 @@ public abstract class GenerateTemplate {
 
     //输出的根路径
     String projectPath = System.getProperty("user.dir");
-    String outputPath = projectPath + "/Generated" + File.separator + meta.getName();
+    String outputPath = projectPath + "/generated" + File.separator + meta.getName();
     if (!FileUtil.exist(outputPath)) {
       FileUtil.mkdir(outputPath);
     }
@@ -89,9 +89,15 @@ public abstract class GenerateTemplate {
     String inputFilePath;
     String outputFilePath;
 
-    //model.DateModel
-    inputFilePath = inputResourcePath + File.separator + "templates/java/model/DateModel.java.ftl";
-    outputFilePath = outputBaseJavaPackagePath + "/model/DateModel.java";
+    //model.DataModel
+    inputFilePath = inputResourcePath + File.separator + "templates/java/model/DataModel.java.ftl";
+    outputFilePath = outputBaseJavaPackagePath + "/model/DataModel.java";
+    DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
+
+    // generator MainGenerator
+    inputFilePath = inputResourcePath + File.separator + "templates/java/generator" + File.separator
+            + "MainGenerator.java.ftl";
+    outputFilePath = outputBaseJavaPackagePath + File.separator + "/generator/MainGenerator.java";
     DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
 
     // command ConfigCommand
@@ -157,12 +163,6 @@ public abstract class GenerateTemplate {
         + "DynamicGenerator.java.ftl";
     outputFilePath =
         outputBaseJavaPackagePath + File.separator + "/generator/DynamicGenerator.java";
-    DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
-
-    // generator MainGenerator
-    inputFilePath = inputResourcePath + File.separator + "templates/java/generator" + File.separator
-        + "MainGenerator.java.ftl";
-    outputFilePath = outputBaseJavaPackagePath + File.separator + "/generator/MainGenerator.java";
     DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
 
     // pom pom.xml

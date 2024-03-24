@@ -6,20 +6,20 @@ import lombok.Data;
  * 数据模型
  */
 @Data
-public class DateModel {
+public class DataModel {
 
   /**
    * 是否生成循环
    */
-  private boolean loop = false;
+  public boolean loop = false;
 
   /**
    * 作者注释
    */
-  private String author = "lfyuoi";
+  public String author = "lfyuoi";
 
   /**
    * 输出信息
    */
-  private String outputText = "sum = ";
+  public String outputText = "sum = ";
 }

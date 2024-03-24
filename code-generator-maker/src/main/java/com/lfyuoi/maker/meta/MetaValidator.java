@@ -14,6 +14,7 @@ import com.lfyuoi.maker.meta.enums.FileTypeEnum;
 import com.lfyuoi.maker.meta.enums.ModelTypeEnum;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MetaValidator {
 
@@ -37,6 +38,17 @@ public class MetaValidator {
       return;
     }
     for (ModelConfig.ModelInfo modelInfo : modelInfoList) {
+      // 为 group，不校验
+      String groupKey = modelInfo.getGroupKey();
+      if (StrUtil.isNotEmpty(groupKey)) {
+        // 生成中间参数
+        List<Meta.ModelConfig.ModelInfo> subModelInfoList = modelInfo.getModels();
+        String allArgsStr = modelInfo.getModels().stream()
+                .map(subModelInfo -> String.format("\"--%s\"", subModelInfo.getFieldName()))
+                .collect(Collectors.joining(", "));
+        modelInfo.setAllArgsStr(allArgsStr);
+        continue;
+      }
       // 输出路径默认值
       String fieldName = modelInfo.getFieldName();
       if (StrUtil.isBlank(fieldName)) {
@@ -87,6 +99,11 @@ public class MetaValidator {
       return;
     }
     for (FileInfo fileInfo : fileInfoList) {
+      String type = fileInfo.getType();
+      // 类型为 group，不校验
+      if (FileTypeEnum.GROUP.getValue().equals(type)){
+        continue;
+      }
       //inputPath 必填项
       String inputPath = fileInfo.getInputPath();
       if (StrUtil.isEmpty(inputPath)) {
@@ -96,8 +113,6 @@ public class MetaValidator {
       if (StrUtil.isEmpty(outputPath)) {
         fileInfo.setOutputPath(inputPath);
       }
-      // 默认为 dir
-      String type = fileInfo.getType();
       if(StrUtil.isBlank(type)){
         // 判断是否有后缀 有后缀就是文件 否则就是目录
         if(StrUtil.isBlank(FileUtil.getSuffix(inputPath))){

@@ -1,6 +1,6 @@
 package com.lfyuoi.maker.generator.file;
 
-import com.lfyuoi.maker.model.DateModel;
+import com.lfyuoi.maker.model.DataModel;
 import freemarker.template.TemplateException;
 
 import java.io.File;
@@ -11,11 +11,11 @@ public class FileGenerator {
 
 
   public static void main(String[] args) throws IOException, TemplateException {
-    DateModel dateModel = new DateModel();
-    dateModel.setAuthor("dexter");
-    dateModel.setLoop(false);
-    dateModel.setOutputText("最终的求和结果：");
-    doGenerate(dateModel);
+    DataModel DataModel = new DataModel();
+    DataModel.setAuthor("dexter");
+    DataModel.setLoop(false);
+    DataModel.setOutputText("最终的求和结果：");
+    doGenerate(DataModel);
   }
 
   /**
