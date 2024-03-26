@@ -71,6 +71,7 @@ public class GenerateCommand implements Callable<Integer> {
         <#-- 填充数据模型对象 -->
         DataModel dataModel = new DataModel();
         BeanUtil.copyProperties(this, dataModel);
+
         <#list modelConfig.models as modelInfo>
         <#if modelInfo.groupKey??>
         dataModel.${modelInfo.groupKey} = ${modelInfo.groupKey};
