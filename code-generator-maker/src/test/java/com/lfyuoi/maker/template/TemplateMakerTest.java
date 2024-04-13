@@ -56,7 +56,7 @@ public class TemplateMakerTest {
         String projectPath = System.getProperty("user.dir");
         String originProjectPath =
                 new File(projectPath).getParent() + File.separator + "code-generator-demo-projects/springboot-init";
-        String inputFilePath1 = "src/main/java/com/lfyuoi/springbootinit/common";
+        String inputFilePath1 = "./";
 
         // 模型参数配置
         TemplateMakerModelConfig templateMakerModelConfig = new TemplateMakerModelConfig();
