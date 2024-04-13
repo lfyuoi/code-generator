@@ -47,4 +47,38 @@ public class TemplateMakerTest {
             1779031041206632448L);
         System.out.println(id);
     }
+    @Test
+    public void testTemplateMakerBug2() {
+        Meta meta = new Meta();
+        meta.setName("acm-template-generator");
+        meta.setDescription("ACM 示例模板生成器");
+
+        String projectPath = System.getProperty("user.dir");
+        String originProjectPath =
+                new File(projectPath).getParent() + File.separator + "code-generator-demo-projects/springboot-init";
+        String inputFilePath1 = "src/main/java/com/lfyuoi/springbootinit/common";
+
+        // 模型参数配置
+        TemplateMakerModelConfig templateMakerModelConfig = new TemplateMakerModelConfig();
+
+        // - 模型配置
+        TemplateMakerModelConfig.ModelInfoConfig modelInfoConfig1 = new TemplateMakerModelConfig.ModelInfoConfig();
+        modelInfoConfig1.setFieldName("className");
+        modelInfoConfig1.setType("String");
+        modelInfoConfig1.setReplaceText("BaseResponse");
+
+        List<TemplateMakerModelConfig.ModelInfoConfig> modelInfoConfigList =
+                Arrays.asList(modelInfoConfig1, modelInfoConfig1);
+        templateMakerModelConfig.setModels(modelInfoConfigList);
+
+        // 文件过滤
+        TemplateMakerFileConfig templateMakerFileConfig = new TemplateMakerFileConfig();
+        TemplateMakerFileConfig.FileInfoConfig fileInfoConfig1 = new TemplateMakerFileConfig.FileInfoConfig();
+        fileInfoConfig1.setPath(inputFilePath1);
+        templateMakerFileConfig.setFiles(Arrays.asList(fileInfoConfig1));
+
+        Long id = TemplateMaker.makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig,
+                1779031041206632448L);
+        System.out.println(id);
+    }
 }
