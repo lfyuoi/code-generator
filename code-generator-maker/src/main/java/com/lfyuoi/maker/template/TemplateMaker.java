@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import com.lfyuoi.maker.meta.Meta;
 import com.lfyuoi.maker.meta.enums.FileGenerateTypeEnum;
 import com.lfyuoi.maker.meta.enums.FileTypeEnum;
+import com.lfyuoi.maker.template.model.TemplateMakerConfig;
 import com.lfyuoi.maker.template.model.TemplateMakerFileConfig;
 import com.lfyuoi.maker.template.model.TemplateMakerModelConfig;
 
@@ -26,6 +27,21 @@ import cn.hutool.json.JSONUtil;
  */
 public class TemplateMaker {
 
+    /**
+     * 制作模板
+     *
+     * @param templateMakerConfig
+     * @return
+     */
+    public static long makeTemplate(TemplateMakerConfig templateMakerConfig) {
+        Long id = templateMakerConfig.getId();
+        Meta meta = templateMakerConfig.getMeta();
+        String originProjectPath = templateMakerConfig.getOriginProjectPath();
+        TemplateMakerFileConfig templateMakerFileConfig = templateMakerConfig.getFileConfig();
+        TemplateMakerModelConfig templateMakerModelConfig = templateMakerConfig.getModelConfig();
+
+        return makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, id);
+    }
     /**
      * 制作模板
      *

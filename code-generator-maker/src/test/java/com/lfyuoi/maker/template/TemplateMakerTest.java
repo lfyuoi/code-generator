@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.json.JSONUtil;
+import com.lfyuoi.maker.template.model.TemplateMakerConfig;
 import org.junit.Test;
 
 import com.lfyuoi.maker.meta.Meta;
@@ -79,6 +82,14 @@ public class TemplateMakerTest {
 
         Long id = TemplateMaker.makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig,
                 1779031041206632448L);
+        System.out.println(id);
+    }
+
+    @Test
+    public void testMakeTemplateWithJSON() {
+        String configStr = ResourceUtil.readUtf8Str("templateMaker.json");
+        TemplateMakerConfig templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
+        long id = TemplateMaker.makeTemplate(templateMakerConfig);
         System.out.println(id);
     }
 }
