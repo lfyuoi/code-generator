@@ -47,6 +47,7 @@ public class TemplateMakerTest {
         templateMakerFileConfig.setFiles(Arrays.asList(fileInfoConfig1));
 
         Long id = TemplateMaker.makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig,
+            null,
             1779031041206632448L);
         System.out.println(id);
     }
@@ -81,6 +82,7 @@ public class TemplateMakerTest {
         templateMakerFileConfig.setFiles(Arrays.asList(fileInfoConfig1));
 
         Long id = TemplateMaker.makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig,
+            null,
                 1779031041206632448L);
         System.out.println(id);
     }
@@ -104,6 +106,14 @@ public class TemplateMakerTest {
         long id = TemplateMaker.makeTemplate(templateMakerConfig);
 
         configStr = ResourceUtil.readUtf8Str(rootPath + "templateMaker1.json");
+        templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
+        TemplateMaker.makeTemplate(templateMakerConfig);
+
+        configStr = ResourceUtil.readUtf8Str(rootPath + "templateMaker2.json");
+        templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
+        TemplateMaker.makeTemplate(templateMakerConfig);
+
+        configStr = ResourceUtil.readUtf8Str(rootPath + "templateMaker3.json");
         templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
         TemplateMaker.makeTemplate(templateMakerConfig);
         System.out.println(id);
