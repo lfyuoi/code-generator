@@ -71,9 +71,9 @@ public class TemplateMaker {
         }
 
         // 一、输入信息
-        // 要挖坑的项目根目录
-        String sourceRootPath =
-            templatePath + File.separator + FileUtil.getLastPathEle(Paths.get(originProjectPath)).toString();
+        // 输入文件信息，获取到项目根目录
+        String sourceRootPath = FileUtil.loopFiles(new File(templatePath), 1, null).stream().filter(File::isDirectory)
+            .findFirst().orElseThrow(RuntimeException::new).getAbsolutePath();
         // Windows 系统需要对路径进行转义
         sourceRootPath = sourceRootPath.replaceAll("\\\\", "/");
 
