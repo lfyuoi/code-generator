@@ -35,16 +35,18 @@ public class DynamicGenerator {
         configuration.setDefaultEncoding("UTF-8");
         configuration.setEncoding(Locale.getDefault(), "UTF-8");
         // 4. 创建模板对象，并设置模板文件
-        Template template = configuration.getTemplate(new File(inputPath).getName(), "UTF-8");
+        String templateName = new File(inputPath).getName();
         // 文件不存在则创建文件和父目录
         if (!FileUtil.exist(outputPath)) {
             FileUtil.touch(outputPath);
         }
         // 5. 输出文件
+        Template template = configuration.getTemplate(templateName, "utf-8");
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(Paths.get(outputPath)), StandardCharsets.UTF_8));
         template.process(model, out);
         // 6. 关闭流
         out.close();
+
     }
 
 

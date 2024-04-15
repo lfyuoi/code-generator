@@ -3,14 +3,14 @@ package com.lfyuoi.maker.meta;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.json.JSONUtil;
 
-public class MateManager {
+public class MetaManager {
 
   //双检锁单例模式
   private static volatile Meta meta;
 
   public static Meta getMetaObject() {
     if (meta == null) {
-      synchronized (MateManager.class) {
+        synchronized (MetaManager.class) {
         if (meta == null) {
           meta = initMeta();
         }
@@ -20,7 +20,8 @@ public class MateManager {
   }
 
   private static Meta initMeta() {
-    String metaJson = ResourceUtil.readUtf8Str("meta.json");
+      // String metaJson = ResourceUtil.readUtf8Str("meta.json");
+      String metaJson = ResourceUtil.readUtf8Str("springboot-init-meta.json");
     Meta newMeta = JSONUtil.toBean(metaJson, Meta.class);
     Meta.FileConfig fileConfig = newMeta.getFileConfig();
     MetaValidator.doValidate(newMeta);
