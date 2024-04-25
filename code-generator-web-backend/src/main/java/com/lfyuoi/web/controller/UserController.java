@@ -30,7 +30,7 @@ import static com.lfyuoi.web.service.impl.UserServiceImpl.SALT;
  * 用户接口
  *
  * @author <a href="https://github.com/lfyuoi">程序员lfyuoi</a>
- * 
+ *
  */
 @RestController
 @RequestMapping("/user")
