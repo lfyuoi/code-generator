@@ -5,7 +5,6 @@ import com.lfyuoi.web.annotation.AuthCheck;
 import com.lfyuoi.web.common.BaseResponse;
 import com.lfyuoi.web.common.ErrorCode;
 import com.lfyuoi.web.common.ResultUtils;
-import com.lfyuoi.web.constant.FileConstant;
 import com.lfyuoi.web.constant.UserConstant;
 import com.lfyuoi.web.exception.BusinessException;
 import com.lfyuoi.web.manager.CosManager;
@@ -141,7 +140,7 @@ public class FileController {
             multipartFile.transferTo(file);
             cosManager.putObject(filepath, file);
             // 返回可访问地址
-            return ResultUtils.success(FileConstant.COS_HOST + filepath);
+            return ResultUtils.success(filepath);
         } catch (Exception e) {
             log.error("file upload error, filepath = " + filepath, e);
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "上传失败");

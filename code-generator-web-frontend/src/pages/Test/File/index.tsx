@@ -1,136 +1,80 @@
-import Footer from '@/components/Footer';
-import { userLoginUsingPost } from '@/services/backend/userController';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { LoginForm, ProFormText } from '@ant-design/pro-components';
-import { useEmotionCss } from '@ant-design/use-emotion-css';
-import { Helmet, history, useModel } from '@umijs/max';
-import { message, Tabs } from 'antd';
+import { COS_HOST } from '@/constants';
+import {
+  testDownloadFileUsingGet,
+  testUploadFileUsingPost,
+} from '@/services/backend/fileController';
+import { InboxOutlined } from '@ant-design/icons';
+import { Button, Card, Divider, Flex, message, Upload, UploadProps } from 'antd';
+import { saveAs } from 'file-saver';
 import React, { useState } from 'react';
-import { Link } from 'umi';
-import Settings from '../../../../config/defaultSettings';
 
-const Login: React.FC = () => {
-  const [type, setType] = useState<string>('account');
-  const { initialState, setInitialState } = useModel('@@initialState');
-  const containerClassName = useEmotionCss(() => {
-    return {
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100vh',
-      overflow: 'auto',
-      backgroundImage:
-        "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
-      backgroundSize: '100% 100%',
-    };
-  });
+const { Dragger } = Upload;
 
-  const handleSubmit = async (values: API.UserLoginRequest) => {
-    try {
-      // 登录
-      const res = await userLoginUsingPost({
-        ...values,
-      });
+/**
+ * 文件上传下载测试页面
+ * @constructor
+ */
+const TestFilePage: React.FC = () => {
+  const [value, setValue] = useState<string>();
 
-      const defaultLoginSuccessMessage = '登录成功！';
-      message.success(defaultLoginSuccessMessage);
-      // 保存已登录用户信息
-      setInitialState({
-        ...initialState,
-        currentUser: res.data,
-      });
-      const urlParams = new URL(window.location.href).searchParams;
-      history.push(urlParams.get('redirect') || '/');
-      return;
-    } catch (error: any) {
-      const defaultLoginFailureMessage = `登录失败，${error.message}`;
-      message.error(defaultLoginFailureMessage);
-    }
+  const props: UploadProps = {
+    name: 'file',
+    multiple: false,
+    maxCount: 1,
+    customRequest: async (fileObj: any) => {
+      try {
+        const res = await testUploadFileUsingPost({}, fileObj.file);
+        fileObj.onSuccess(res.data);
+        setValue(res.data);
+      } catch (e: any) {
+        message.error('上传失败，' + e.message);
+        fileObj.onError(e);
+      }
+    },
+    onRemove() {
+      setValue(undefined);
+    },
   };
 
   return (
-    <div className={containerClassName}>
-      <Helmet>
-        <title>
-          {'登录'}- {Settings.title}
-        </title>
-      </Helmet>
-      <div
-        style={{
-          flex: '1',
-          padding: '32px 0',
-        }}
-      >
-        <LoginForm
-          contentStyle={{
-            minWidth: 280,
-            maxWidth: '75vw',
-          }}
-          logo={<img alt="logo" style={{ height: '100%' }} src="/logo.png" />}
-          title="代码生成器前端"
-          subTitle={'代码生成器在线制作共享，大幅提升开发效率'}
-          initialValues={{
-            autoLogin: true,
-          }}
-          onFinish={async (values) => {
-            await handleSubmit(values as API.UserLoginRequest);
+    <Flex gap={16}>
+      <Card title="文件上传">
+        <Dragger {...props}>
+          <p className="ant-upload-drag-icon">
+            <InboxOutlined />
+          </p>
+          <p className="ant-upload-text">Click or drag file to this area to upload</p>
+          <p className="ant-upload-hint">
+            Support for a single or bulk upload. Strictly prohibited from uploading company data or
+            other banned files.
+          </p>
+        </Dragger>
+      </Card>
+      <Card title="文件下载" loading={!value}>
+        <div>文件地址：{COS_HOST + value}</div>
+        <Divider />
+        <img src={COS_HOST + value} height={280} />
+        <Divider />
+        <Button
+          onClick={async () => {
+            const blob = await testDownloadFileUsingGet(
+              {
+                filepath: value,
+              },
+              {
+                responseType: 'blob',
+              },
+            );
+            // 使用 file-saver 来保存文件
+            const fullPath = COS_HOST + value;
+            saveAs(blob, fullPath.substring(fullPath.lastIndexOf('/') + 1));
           }}
         >
-          <Tabs
-            activeKey={type}
-            onChange={setType}
-            centered
-            items={[
-              {
-                key: 'account',
-                label: '账户密码登录',
-              },
-            ]}
-          />
-          {type === 'account' && (
-            <>
-              <ProFormText
-                name="userAccount"
-                fieldProps={{
-                  size: 'large',
-                  prefix: <UserOutlined />,
-                }}
-                placeholder={'请输入账号'}
-                rules={[
-                  {
-                    required: true,
-                    message: '账号是必填项！',
-                  },
-                ]}
-              />
-              <ProFormText.Password
-                name="userPassword"
-                fieldProps={{
-                  size: 'large',
-                  prefix: <LockOutlined />,
-                }}
-                placeholder={'请输入密码'}
-                rules={[
-                  {
-                    required: true,
-                    message: '密码是必填项！',
-                  },
-                ]}
-              />
-            </>
-          )}
-
-          <div
-            style={{
-              marginBottom: 24,
-              textAlign: 'right',
-            }}
-          >
-            <Link to="/user/register">新用户注册</Link>
-          </div>
-        </LoginForm>
-      </div>
-      <Footer />
-    </div>
+          点击下载文件
+        </Button>
+      </Card>
+    </Flex>
   );
 };
-export default Login;
+
+export default TestFilePage;

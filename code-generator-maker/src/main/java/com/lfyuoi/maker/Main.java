@@ -2,8 +2,10 @@ package com.lfyuoi.maker;
 
 import java.io.IOException;
 
+import com.lfyuoi.maker.generator.main.GenerateTemplate;
 import com.lfyuoi.maker.generator.main.MainGenerator;
 
+import com.lfyuoi.maker.generator.main.ZipGenerator;
 import freemarker.template.TemplateException;
 
 /**
@@ -12,7 +14,7 @@ import freemarker.template.TemplateException;
 public class Main {
 
     public static void main(String[] args) throws TemplateException, IOException, InterruptedException {
-        MainGenerator mainGenerator = new MainGenerator();
-        mainGenerator.doGenerate();
+        GenerateTemplate generateTemplate = new ZipGenerator();
+        generateTemplate.doGenerate();
     }
 }

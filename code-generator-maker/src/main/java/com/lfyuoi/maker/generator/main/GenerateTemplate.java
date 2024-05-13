@@ -3,6 +3,7 @@ package com.lfyuoi.maker.generator.main;
 import java.io.File;
 import java.io.IOException;
 
+import cn.hutool.core.util.ZipUtil;
 import com.lfyuoi.maker.generator.JarGenerator;
 import com.lfyuoi.maker.generator.ScriptGenerator;
 import com.lfyuoi.maker.generator.file.DynamicFileGenerator;
@@ -165,7 +166,7 @@ public abstract class GenerateTemplate {
      * @param jarPath
      * @param shellOutputFilePath
      */
-    protected void buildDist(String outputPath, String sourceCopyDestPath, String jarPath, String shellOutputFilePath) {
+    protected String buildDist(String outputPath, String sourceCopyDestPath, String jarPath, String shellOutputFilePath) {
         String distOutputPath = outputPath + "-dist";
         // 拷贝 jar 包
         String targetAbsolutePath = distOutputPath + File.separator + "target";
@@ -176,5 +177,18 @@ public abstract class GenerateTemplate {
         FileUtil.copy(shellOutputFilePath, distOutputPath, true);
         // 拷贝源模板文件
         FileUtil.copy(sourceCopyDestPath, distOutputPath, true);
+        return distOutputPath;
+    }
+
+    /**
+     * 制作压缩包
+     *
+     * @param outputPath
+     * @retrun 压缩包路径
+     */
+    protected  String  buildZip(String outputPath){
+        String zipPath = outputPath + ".zip";
+        ZipUtil.zip(outputPath,zipPath);
+        return zipPath;
     }
 }
