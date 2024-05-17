@@ -18,10 +18,10 @@ import lombok.Data;
 public class DataModel {
 <#list modelConfig.models as modelInfo>
 
-    <#--  有分组  -->
+<#-- 有分组 -->
     <#if modelInfo.groupKey??>
     /**
-     *  ${modelInfo.groupName}
+     * ${modelInfo.groupName}
      */
     public ${modelInfo.type} ${modelInfo.groupKey} = new ${modelInfo.type}();
 
@@ -30,9 +30,9 @@ public class DataModel {
      */
     @Data
     public static class ${modelInfo.type} {
-        <#list modelInfo.models as modelInfo>
-           <@generateModel indent="        " modelInfo=modelInfo />
-         </#list>
+    <#list modelInfo.models as modelInfo>
+        <@generateModel indent="        " modelInfo=modelInfo />
+    </#list>
     }
 
     <#else>

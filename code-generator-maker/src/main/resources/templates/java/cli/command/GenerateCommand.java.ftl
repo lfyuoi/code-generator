@@ -12,13 +12,13 @@ import java.util.concurrent.Callable;
 
 <#-- 生成选项 -->
 <#macro generateOption indent modelInfo>
-${indent}@Option(names = {<#if modelInfo.abbr??>"-${modelInfo.abbr}", </#if>"--${modelInfo.fieldName}"}, arity = "0..1", <#if modelInfo.description??>description = "${modelInfo.description}", </#if>interactive = true, echo = true)
-${indent}private ${modelInfo.type} ${modelInfo.fieldName}<#if modelInfo.defaultValue??> = ${modelInfo.defaultValue?c}</#if>;
+    ${indent}@Option(names = {<#if modelInfo.abbr??>"-${modelInfo.abbr}", </#if>"--${modelInfo.fieldName}"}, arity = "0..1", <#if modelInfo.description??>description = "${modelInfo.description}", </#if>interactive = true, echo = true)
+    ${indent}private ${modelInfo.type} ${modelInfo.fieldName}<#if modelInfo.defaultValue??> = ${modelInfo.defaultValue?c}</#if>;
 </#macro>
 
 <#-- 生成命令调用 -->
 <#macro generateCommand indent modelInfo>
-${indent}System.out.println("输入${modelInfo.groupName}配置：");
+    ${indent}System.out.println("输入${modelInfo.groupName}配置：");
 ${indent}CommandLine ${modelInfo.groupKey}CommandLine = new CommandLine(${modelInfo.type}Command.class);
     ${indent}${modelInfo.groupKey}CommandLine.execute(${modelInfo.allArgsStr});
 </#macro>
@@ -28,7 +28,7 @@ ${indent}CommandLine ${modelInfo.groupKey}CommandLine = new CommandLine(${modelI
 public class GenerateCommand implements Callable<Integer> {
 <#list modelConfig.models as modelInfo>
 
-    <#-- 有分组 -->
+<#-- 有分组 -->
     <#if modelInfo.groupKey??>
     /**
      * ${modelInfo.groupName}
@@ -46,36 +46,35 @@ public class GenerateCommand implements Callable<Integer> {
         @Override
         public void run() {
             <#list modelInfo.models as subModelInfo>
-            ${modelInfo.groupKey}.${subModelInfo.fieldName} = ${subModelInfo.fieldName};
+                ${modelInfo.groupKey}.${subModelInfo.fieldName} = ${subModelInfo.fieldName};
             </#list>
         }
     }
     <#else>
-    <@generateOption indent="    " modelInfo=modelInfo />
+        <@generateOption indent="    " modelInfo=modelInfo />
     </#if>
 </#list>
 
-    <#-- 生成调用方法 -->
+<#-- 生成调用方法 -->
     public Integer call() throws Exception {
         <#list modelConfig.models as modelInfo>
-        <#if modelInfo.groupKey??>
-        <#if modelInfo.condition??>
+            <#if modelInfo.groupKey??>
+                <#if modelInfo.condition??>
         if (${modelInfo.condition}) {
             <@generateCommand indent="            " modelInfo=modelInfo />
         }
-        <#else>
-        <@generateCommand indent="      " modelInfo=modelInfo />
-        </#if>
-        </#if>
+                <#else>
+                    <@generateCommand indent="      " modelInfo=modelInfo />
+                </#if>
+            </#if>
         </#list>
-        <#-- 填充数据模型对象 -->
+    <#-- 填充数据模型对象 -->
         DataModel dataModel = new DataModel();
         BeanUtil.copyProperties(this, dataModel);
-
         <#list modelConfig.models as modelInfo>
-        <#if modelInfo.groupKey??>
+            <#if modelInfo.groupKey??>
         dataModel.${modelInfo.groupKey} = ${modelInfo.groupKey};
-        </#if>
+            </#if>
         </#list>
         MainGenerator.doGenerate(dataModel);
         return 0;

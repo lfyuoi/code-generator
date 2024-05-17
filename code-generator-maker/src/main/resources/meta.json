@@ -4,7 +4,7 @@
   "basePackage": "com.lfyuoi",
   "version": "1.0",
   "author": "lfyuoi",
-  "createTime": "2024-3-17",
+  "createTime": "2023-11-22",
   "fileConfig": {
     "inputRootPath": ".source/acm-template-pro",
     "outputRootPath": "generated",
@@ -12,14 +12,8 @@
     "type": "dir",
     "files": [
       {
-        "inputPath": "src/com/lfyuoi/acm/MainTemplate.java.ftl",
-        "outputPath": "src/com/lfyuoi/acm/MainTemplate.java",
-        "type": "file",
-        "generateType": "dynamic"
-      },
-      {
-        "groupKey": "acmTemplate",
-        "groupName": "gitignore 和 README.md",
+        "groupKey": "git",
+        "groupName": "开源",
         "type": "group",
         "condition": "needGit",
         "files": [
@@ -27,8 +21,7 @@
             "inputPath": ".gitignore",
             "outputPath": ".gitignore",
             "type": "file",
-            "generateType": "static",
-            "condition": "needGit"
+            "generateType": "static"
           },
           {
             "inputPath": "README.md",
@@ -37,6 +30,12 @@
             "generateType": "static"
           }
         ]
+      },
+      {
+        "inputPath": "src/com/lfyuoi/acm/MainTemplate.java.ftl",
+        "outputPath": "src/com/lfyuoi/acm/MainTemplate.java",
+        "type": "file",
+        "generateType": "dynamic"
       }
     ]
   },
@@ -45,9 +44,8 @@
       {
         "fieldName": "needGit",
         "type": "boolean",
-        "description": "是否生成.gitignore文件",
-        "defaultValue": true,
-        "abbr": "n"
+        "description": "是否生成 .gitignore 文件",
+        "defaultValue": true
       },
       {
         "fieldName": "loop",

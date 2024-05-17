@@ -1,6 +1,6 @@
 package com.lfyuoi.web.model.dto.generator;
 
-import com.lfyuoi.web.meta.Meta;
+import com.lfyuoi.maker.meta.Meta;
 import lombok.Data;
 
 import java.io.Serializable;
