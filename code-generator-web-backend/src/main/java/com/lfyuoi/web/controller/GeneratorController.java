@@ -1,12 +1,15 @@
 package com.lfyuoi.web.controller;
 
+import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lfyuoi.maker.generator.main.GenerateTemplate;
 import com.lfyuoi.maker.generator.main.ZipGenerator;
@@ -20,6 +23,7 @@ import com.lfyuoi.web.common.ResultUtils;
 import com.lfyuoi.web.constant.UserConstant;
 import com.lfyuoi.web.exception.BusinessException;
 import com.lfyuoi.web.exception.ThrowUtils;
+import com.lfyuoi.web.manager.CacheManager;
 import com.lfyuoi.web.manager.CosManager;
 import com.lfyuoi.web.model.dto.generator.*;
 import com.lfyuoi.web.model.entity.Generator;
@@ -65,6 +69,9 @@ public class GeneratorController {
 
     @Resource
     private CosManager cosManager;
+
+    @Resource
+    private CacheManager cacheManager;
 
     // region 增删改查
 
@@ -185,8 +192,7 @@ public class GeneratorController {
     public BaseResponse<Page<Generator>> listGeneratorByPage(@RequestBody GeneratorQueryRequest generatorQueryRequest) {
         long current = generatorQueryRequest.getCurrent();
         long size = generatorQueryRequest.getPageSize();
-        Page<Generator> generatorPage = generatorService.page(new Page<>(current, size),
-                generatorService.getQueryWrapper(generatorQueryRequest));
+        Page<Generator> generatorPage = generatorService.page(new Page<>(current, size), generatorService.getQueryWrapper(generatorQueryRequest));
         return ResultUtils.success(generatorPage);
     }
 
@@ -198,19 +204,16 @@ public class GeneratorController {
      * @return
      */
     @PostMapping("/list/page/vo")
-    public BaseResponse<Page<GeneratorVO>> listGeneratorVOByPage(@RequestBody GeneratorQueryRequest generatorQueryRequest,
-                                                                 HttpServletRequest request) {
+    public BaseResponse<Page<GeneratorVO>> listGeneratorVOByPage(@RequestBody GeneratorQueryRequest generatorQueryRequest, HttpServletRequest request) {
         long current = generatorQueryRequest.getCurrent();
         long size = generatorQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        Page<Generator> generatorPage = generatorService.page(new Page<>(current, size),
-                generatorService.getQueryWrapper(generatorQueryRequest));
+        Page<Generator> generatorPage = generatorService.page(new Page<>(current, size), generatorService.getQueryWrapper(generatorQueryRequest));
         stopWatch.stop();
         System.out.println("查询生成器：" + stopWatch.getTotalTimeMillis());
-
         stopWatch = new StopWatch();
         stopWatch.start();
         Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
@@ -220,6 +223,42 @@ public class GeneratorController {
     }
 
     /**
+     * 快速分页获取列表（封装类）
+     *
+     * @param generatorQueryRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/list/page/vo/fast")
+    public BaseResponse<Page<GeneratorVO>> listGeneratorVOByPageFast(@RequestBody GeneratorQueryRequest generatorQueryRequest, HttpServletRequest request) {
+        long current = generatorQueryRequest.getCurrent();
+        long size = generatorQueryRequest.getPageSize();
+        String cacheKey = getPageCacheKey(generatorQueryRequest);
+
+        //优先从缓存读取,多级缓存先从本地缓存读取，未命中则从Redis缓存读取
+        String cacheValue = cacheManager.get(cacheKey);
+        if (StrUtil.isNotBlank(cacheValue)){
+            Page<GeneratorVO> generatorVOPage = JSONUtil.toBean(cacheValue, new TypeReference<Page<GeneratorVO>>() {
+            }, false);
+            return ResultUtils.success(generatorVOPage);
+        }
+        // 限制爬虫
+        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        QueryWrapper<Generator> queryWrapper = generatorService.getQueryWrapper(generatorQueryRequest);
+        queryWrapper.select("id", "name", "description", "tags", "picture", "status", "userId", "createTime", "updateTime", "isDelete");
+        Page<Generator> generatorPage = generatorService.page(new Page<>(current, size), queryWrapper);
+        Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
+        generatorVOPage.getRecords().forEach(generatorVO -> {
+            generatorVO.setFileConfig(null);
+            generatorVO.setModelConfig(null);
+        });
+        //写入缓存
+        cacheManager.put(cacheKey,JSONUtil.toJsonStr(generatorVOPage));
+        return ResultUtils.success(generatorVOPage);
+    }
+
+
+    /**
      * 分页获取当前用户创建的资源列表
      *
      * @param generatorQueryRequest
@@ -227,8 +266,7 @@ public class GeneratorController {
      * @return
      */
     @PostMapping("/my/list/page/vo")
-    public BaseResponse<Page<GeneratorVO>> listMyGeneratorVOByPage(@RequestBody GeneratorQueryRequest generatorQueryRequest,
-                                                                   HttpServletRequest request) {
+    public BaseResponse<Page<GeneratorVO>> listMyGeneratorVOByPage(@RequestBody GeneratorQueryRequest generatorQueryRequest, HttpServletRequest request) {
         if (generatorQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -238,8 +276,7 @@ public class GeneratorController {
         long size = generatorQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<Generator> generatorPage = generatorService.page(new Page<>(current, size),
-                generatorService.getQueryWrapper(generatorQueryRequest));
+        Page<Generator> generatorPage = generatorService.page(new Page<>(current, size), generatorService.getQueryWrapper(generatorQueryRequest));
         return ResultUtils.success(generatorService.getGeneratorVOPage(generatorPage, request));
     }
 
@@ -295,28 +332,41 @@ public class GeneratorController {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
 
-        String filepath = generator.getDistPath();
-        if (StrUtil.isBlank(filepath)) {
+        String distPath = generator.getDistPath();
+        if (StrUtil.isBlank(distPath)) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物包不存在");
         }
 
         // 追踪事件
-        log.info("用户 {} 下载了 {}", loginUser, filepath);
+        log.info("用户 {} 下载了 {}", loginUser, distPath);
+
+// 设置响应头
+        response.setContentType("application/octet-stream;charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=" + distPath);
+
+// 优先从缓存读取
+        String zipFilePath = getCacheFilePath(id, distPath);
+        if (FileUtil.exist(zipFilePath)) {
+            // 写入响应
+            Files.copy(Paths.get(zipFilePath), response.getOutputStream());
+            return;
+        }
 
         COSObjectInputStream cosObjectInput = null;
         try {
-            COSObject cosObject = cosManager.getObject(filepath);
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            COSObject cosObject = cosManager.getObject(distPath);
             cosObjectInput = cosObject.getObjectContent();
             // 处理下载到的流
             byte[] bytes = IOUtils.toByteArray(cosObjectInput);
-            // 设置响应头
-            response.setContentType("application/octet-stream;charset=UTF-8");
-            response.setHeader("Content-Disposition", "attachment; filename=" + filepath);
+            stopWatch.stop();
+            System.out.println(stopWatch.getTotalTimeMillis());
             // 写入响应
             response.getOutputStream().write(bytes);
             response.getOutputStream().flush();
         } catch (Exception e) {
-            log.error("file download error, filepath = " + filepath, e);
+            log.error("file download error, filepath = " + distPath, e);
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "下载失败");
         } finally {
             if (cosObjectInput != null) {
@@ -382,12 +432,7 @@ public class GeneratorController {
         // 执行脚本
         // 找到脚本文件所在路径
         // 要注意，如果不是 windows 系统，找 generator 文件而不是 bat
-        File scriptFile = FileUtil.loopFiles(unzipDistDir, 2, null)
-                .stream()
-                .filter(file -> file.isFile()
-                        && "generator.bat".equals(file.getName()))
-                .findFirst()
-                .orElseThrow(RuntimeException::new);
+        File scriptFile = FileUtil.loopFiles(unzipDistDir, 2, null).stream().filter(file -> file.isFile() && "generator.bat".equals(file.getName())).findFirst().orElseThrow(RuntimeException::new);
 
         // 添加可执行权限
         try {
@@ -510,5 +555,74 @@ public class GeneratorController {
         CompletableFuture.runAsync(() -> {
             FileUtil.del(tempDirPath);
         });
+    }
+
+    /**
+     * 缓存代码生成器
+     *
+     * @param generatorCacheRequest
+     * @param request
+     * @param response
+     */
+    @PostMapping("/cache")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public void cacheGenerator(@RequestBody GeneratorCacheRequest generatorCacheRequest, HttpServletRequest request, HttpServletResponse response) {
+        if (generatorCacheRequest == null || generatorCacheRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        // 获取生成器
+        long id = generatorCacheRequest.getId();
+        Generator generator = generatorService.getById(id);
+        if (generator == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+
+        String distPath = generator.getDistPath();
+        if (StrUtil.isBlank(distPath)) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物包不存在");
+        }
+
+        // 缓存空间
+        String zipFilePath = getCacheFilePath(id, distPath);
+
+        // 新建文件
+        if (!FileUtil.exist(zipFilePath)) {
+            FileUtil.touch(zipFilePath);
+        }
+
+        // 下载生成器
+        try {
+            cosManager.download(distPath, zipFilePath);
+        } catch (InterruptedException e) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "压缩包下载失败");
+        }
+    }
+
+
+    /**
+     * 获取缓存文件路径
+     *
+     * @param id
+     * @param distPath
+     * @return
+     */
+    public String getCacheFilePath(long id, String distPath) {
+        String projectPath = System.getProperty("user.dir");
+        String tempDirPath = String.format("%s/.temp/cache/%s", projectPath, id);
+        String zipFilePath = String.format("%s/%s", tempDirPath, distPath);
+        return zipFilePath;
+    }
+
+    /**
+     * 获取分页缓存 key
+     * @param generatorQueryRequest
+     * @return
+     */
+    public static String getPageCacheKey(GeneratorQueryRequest generatorQueryRequest) {
+        String jsonStr = JSONUtil.toJsonStr(generatorQueryRequest);
+        String base64 = Base64Encoder.encode(jsonStr);
+        String key = "generator:page:" + base64;
+        return key;
     }
 }

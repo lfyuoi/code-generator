@@ -126,6 +126,11 @@ declare namespace API {
     version?: string;
   };
 
+  type GeneratorCacheRequest = {
+    dataModel?: Record<string, any>;
+    id?: number;
+  };
+
   type GeneratorEditRequest = {
     author?: string;
     basePackage?: string;

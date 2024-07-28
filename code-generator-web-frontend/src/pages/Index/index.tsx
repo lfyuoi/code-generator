@@ -1,5 +1,5 @@
 import {
-  listGeneratorVoByPageUsingPost
+  listGeneratorVoByPageUsingPost,listGeneratorVoByPageFastUsingPost
 } from '@/services/backend/generatorController';
 import { UserOutlined } from '@ant-design/icons';
 import { PageContainer, ProFormSelect, ProFormText, QueryFilter } from '@ant-design/pro-components';
@@ -13,7 +13,7 @@ import {Link} from "umi";
  */
 const DEFAULT_PAGE_PARAMS: PageRequest = {
   current: 1,
-  pageSize: 4,
+  pageSize: 12,
   sortField: 'createTime',
   sortOrder: 'descend',
 };
@@ -31,20 +31,20 @@ const IndexPage: React.FC = () => {
     ...DEFAULT_PAGE_PARAMS,
   });
 
-  /**
-   * 搜索
-   */
-  const doSearch = async () => {
-    setLoading(true);
-    try {
-      const res = await listGeneratorVoByPageUsingPost(searchParams);
-      setDataList(res.data?.records ?? []);
-      setTotal(Number(res.data?.total) ?? 0);
-    } catch (error: any) {
-      message.error('获取数据失败，' + error.message);
-    }
-    setLoading(false);
-  };
+    /**
+     * 搜索
+     */
+    const doSearch = async () => {
+        setLoading(true);
+        try {
+            const res = await listGeneratorVoByPageFastUsingPost(searchParams);
+            setDataList(res.data?.records ?? []);
+            setTotal(Number(res.data?.total) ?? 0);
+        } catch (error: any) {
+            message.error('获取数据失败，' + error.message);
+        }
+        setLoading(false);
+    };
 
   useEffect(() => {
     doSearch();
