@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
               <GithubOutlined /> 灵风源码
             </>
           ),
-          href: 'https://github.com/liyupi',
+          href: 'https://github.com/lfyuoi/code-generator/',
           blankTarget: true,
         },
       ]}
