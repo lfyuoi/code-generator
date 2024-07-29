@@ -12,11 +12,12 @@ public class JarGenerator {
         // 清理之前的构建 并打包
         // 不同操作系统，执行的命令也不同 maven 打包
         String mavenCommand;
-        if (System.getProperty("os.name").contains("Windows")){
-            mavenCommand = "mvn.cmd clean package -Dmaven.test.skip=true";
-        }else {
-            mavenCommand = "mvn clean package -Dmaven.test.skip=true";
-        }
+//        if (System.getProperty("os.name").contains("Windows")){
+//            mavenCommand = "mvn.cmd clean package -Dmaven.test.skip=true";
+//        }else {
+//            mavenCommand = "mvn clean package -Dmaven.test.skip=true";
+//        }
+        mavenCommand = "mvn clean package -Dmaven.test.skip=true";
         System.out.println("开始打包......");
         System.out.println(mavenCommand);
 
